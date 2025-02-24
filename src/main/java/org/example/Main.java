@@ -2,6 +2,8 @@ package org.example;
 
 import org.example.clients.ClientDAOImpl;
 import org.example.clients.ClientsService;
+import org.example.products.ProductDAOImpl;
+import org.example.products.ProductService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -31,7 +33,7 @@ public class Main {
                         new ClientsService(new ClientDAOImpl(connection)).runDB();
                         break;
                     case "2":
-                        //Products
+                        new ProductService(new ProductDAOImpl(connection)).start();
                         break;
                     case "3":
                         //Orders
@@ -48,8 +50,8 @@ public class Main {
 
         try (Statement st = connection.createStatement()){
             //orders table
-            st.execute("DROP TABLE IF EXISTS orders");
-            st.execute("CREATE TABLE orders (" +
+            st.execute("DROP TABLE IF EXISTS Orders");
+            st.execute("CREATE TABLE Orders (" +
                     "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "client_id INT NOT NULL, " +
                     "date DATE NOT NULL, " +
@@ -57,8 +59,8 @@ public class Main {
                     "FOREIGN KEY (client_id) REFERENCES Clients(id)"
                     + ")");
             //clients table
-            st.execute("DROP TABLE IF EXISTS clients");
-            st.execute("CREATE TABLE clients (" +
+            st.execute("DROP TABLE IF EXISTS Clients");
+            st.execute("CREATE TABLE Clients (" +
                     "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "firstName VARCHAR(20) NOT NULL, " +
                     "lastName VARCHAR(30) NOT NULL, " +
@@ -66,23 +68,23 @@ public class Main {
                     "email VARCHAR(50) NOT NULL"
                     + ")");
             //products table
-            st.execute("DROP TABLE IF EXISTS products");
-            st.execute("CREATE TABLE products (" +
+            st.execute("DROP TABLE IF EXISTS Products");
+            st.execute("CREATE TABLE Products (" +
                     "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "article VARCHAR(10) NOT NULL, " +
                     "name VARCHAR(50) NOT NULL, " +
                     "price DECIMAL(10, 2) NOT NULL, " +
-                    "count INT NOT NULL, " +
+                    "quantity DECIMAL(20, 5) NOT NULL, " +
                     "unit VARCHAR(10) NOT NULL "
                     + ")");
             //orders_items table
-            st.execute("DROP TABLE IF EXISTS orders_items");
-            st.execute("CREATE TABLE orders_items (" +
+            st.execute("DROP TABLE IF EXISTS Orders_items");
+            st.execute("CREATE TABLE Orders_items (" +
                     "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "order_id INT NOT NULL, " +
                     "product_id INT NOT NULL, " +
                     "price DECIMAL(10, 2) NOT NULL, " +
-                    "count INT NOT NULL, " +
+                    "quantity DECIMAL(20, 5) NOT NULL, " +
                     "unit VARCHAR(10) NOT NULL " +
                     "FOREIGN KEY (product_id) REFERENCES Products(id) " +
                     "FOREIGN KEY (order_id) REFERENCES Orders(id) "
