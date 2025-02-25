@@ -136,4 +136,72 @@ public class ProductDAOImpl implements ProductDAO {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public Product getProductById() {
+        int productId;
+        while (true) {
+            try {
+                System.out.println("Enter product id -> ");
+                productId = Integer.parseInt(scanner.nextLine());
+
+                if (!productExists(productId)) {
+                    System.out.println("Product with id " + productId + " does not exist. Try again.");
+                    continue;
+                }
+                return getProductById(productId);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid product ID.");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private boolean productExists(int productId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Products WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Product getProductById(int productId) throws SQLException {
+        Product product = new Product();
+        String sql = "SELECT id, article, name, price, quantity, unit FROM Products WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    product.setId(rs.getInt("id"));
+                    product.setArticle(rs.getString("article"));
+                    product.setName(rs.getString("name"));
+                    product.setPrice(rs.getDouble("price"));
+                    product.setQuantity(rs.getDouble("quantity"));
+                    Units unit = Units.fromString(rs.getString("unit"));
+                    product.setUnit(unit);
+                    return product;
+                }
+            }
+        }
+        return product;
+    }
+
+    @Override
+    public void updateProductQuantity(int productId, double newQuantity){
+        String sql = "UPDATE Products SET quantity = ? WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setDouble(1, newQuantity);
+            ps.setInt(2, productId);
+            ps.executeUpdate();
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

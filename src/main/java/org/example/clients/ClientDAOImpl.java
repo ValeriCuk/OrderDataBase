@@ -66,4 +66,45 @@ public class ClientDAOImpl implements ClientDAO {
         }
     }
 
+    @Override
+    public int getClientByID() {
+        int clientId;
+        while (true) {
+            try {
+                System.out.println("Enter client id -> ");
+                clientId = Integer.parseInt(scanner.nextLine());
+                if (!clientExists(clientId)) {
+                    System.out.println("Client with id " + clientId + " does not exist. Try again.");
+                    continue;
+                }
+                return clientId;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid client ID.");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private boolean clientExists(int clientId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Clients WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, clientId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Client client = new Client(
+                            rs.getInt("id"),
+                            rs.getString("firstName"),
+                            rs.getString("lastName"),
+                            rs.getString("phone"),
+                            rs.getString("email")
+                    );
+                    System.out.println("Client: " + client);
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
 }

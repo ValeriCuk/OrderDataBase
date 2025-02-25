@@ -2,6 +2,7 @@ package org.example.products;
 
 import org.example.clients.Client;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -10,8 +11,8 @@ public class ProductService {
     private final ProductDAO productDAO;
     private final Scanner scanner = new Scanner(System.in);
 
-    public ProductService(ProductDAO productDAO) {
-        this.productDAO = productDAO;
+    public ProductService(Connection connection) {
+        this.productDAO = new ProductDAOImpl(connection);
     }
 
     public void start() {
@@ -34,7 +35,7 @@ public class ProductService {
                     }
                     break;
                 default:
-                    break;
+                    return;
             }
         }
     }

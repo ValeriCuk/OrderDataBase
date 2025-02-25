@@ -1,5 +1,6 @@
 package org.example.clients;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -8,11 +9,11 @@ public class ClientsService {
     private final ClientDAO clientDAO;
     private final Scanner scanner = new Scanner(System.in);
 
-    public ClientsService(ClientDAO clientDAO) {
-        this.clientDAO = clientDAO;
+    public ClientsService(Connection connection) {
+        this.clientDAO = new ClientDAOImpl(connection);
     }
 
-    public void runDB(){
+    public void start(){
         while (true) {
             System.out.println("Clients DB");
             System.out.println("\t1: add client");
@@ -32,7 +33,7 @@ public class ClientsService {
                     }
                     break;
                 default:
-                    break;
+                    return;
             }
         }
     }
