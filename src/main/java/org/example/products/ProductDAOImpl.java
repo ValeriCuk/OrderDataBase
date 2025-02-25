@@ -1,7 +1,5 @@
 package org.example.products;
 
-import org.example.clients.Client;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,7 +147,7 @@ public class ProductDAOImpl implements ProductDAO {
                     System.out.println("Product with id " + productId + " does not exist. Try again.");
                     continue;
                 }
-                return getProductById(productId);
+                return getProductFromDB(productId);
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a valid product ID.");
             } catch (SQLException e) {
@@ -171,7 +169,7 @@ public class ProductDAOImpl implements ProductDAO {
         return false;
     }
 
-    private Product getProductById(int productId) throws SQLException {
+    private Product getProductFromDB(int productId) throws SQLException {
         Product product = new Product();
         String sql = "SELECT id, article, name, price, quantity, unit FROM Products WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {

@@ -87,7 +87,7 @@ public class ClientDAOImpl implements ClientDAO {
     }
 
     private boolean clientExists(int clientId) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Clients WHERE id = ?";
+        String sql = "SELECT id, firstName, lastName, phone, email FROM Clients WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, clientId);
             try (ResultSet rs = ps.executeQuery()) {

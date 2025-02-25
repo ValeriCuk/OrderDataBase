@@ -30,9 +30,11 @@ public class OrderDAOImpl implements OrderDAO {
         int clientID = clientDAO.getClientByID();
 
         try {
-            try (PreparedStatement ps = connection.prepareStatement("INSERT INTO Orders (client_id, date, amount) VALUES(?, CURRENT_DATE, ?)")) {
+            try (PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO Orders (client_id, date, amount) VALUES(?, CURRENT_DATE, ?)",
+                    Statement.RETURN_GENERATED_KEYS)) {
                 ps.setInt(1, clientID);
-                ps.setDouble(3, 0.0);
+                ps.setDouble(2, 0.0);
                 ps.executeUpdate();
                 System.out.println("Order created successfully");
 
@@ -52,12 +54,13 @@ public class OrderDAOImpl implements OrderDAO {
 
     private void addProductsToOrder(int orderId) {
         while (true) {
-            System.out.print("Do you want to add a product? (yes/no)");
+            System.out.println("Do you want to add a product? (yes/no)");
             String answer = scanner.nextLine().trim().toLowerCase();
             if (!answer.equals("yes")) {
                 break;
             }
             Product product = productDAO.getProductById();
+            System.out.println(product);
             double quantity = setQuantity(product.getId(), product.getQuantity());
 
             String insertItemSQL = "INSERT INTO Orders_items (order_id, product_id, price, quantity, unit) VALUES (?, ?, ?, ?, ?)";
@@ -68,7 +71,6 @@ public class OrderDAOImpl implements OrderDAO {
                 psItem.setDouble(4, quantity);
                 psItem.setString(5, product.getUnit().toString());
                 psItem.executeUpdate();
-                System.out.println("Product " + product + " added successfully");
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
